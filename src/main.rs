@@ -88,14 +88,24 @@ fn edit_cell(s: &mut Cursive, row: i32, col: i32) {
 
     s.add_layer(
         Dialog::new()
-        .content(EditView::new().content(cell_content).with_name("cell"))
-        .button("Ok", move |x|{
-            let new_cell_content = x.call_on_name("cell", |view: &mut EditView| {
-                view.get_content()
-            }).unwrap();
+        .content(
+            EditView::new()
+            .content(cell_content)
+            .on_submit(move |s, content| {
 
-            ok(x, &new_cell_content, row, col)
-        })
+                ok(s, content, row, col)
+            })
+            .with_name("cell")
+            .fixed_width(20)
+
+        )
+        // .button("Ok", move |x|{
+        //     let new_cell_content = x.call_on_name("cell", |view: &mut EditView| {
+        //         view.get_content()
+        //     }).unwrap();
+
+        //     ok(x, &new_cell_content, row, col)
+        // })
         .button("Cancel", |x| { x.pop_layer(); })
     )
 }
