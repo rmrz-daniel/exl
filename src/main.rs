@@ -53,9 +53,11 @@ fn main() {
         });
 
 
+    cursive.add_global_callback('q', |s| s.quit());
+    cursive.add_global_callback('s', |s| s.quit());
     cursive.add_layer(
         Dialog::new()
-            .title("exL Sheet")
+            .title("Quick exL")
             .button("Save", |s| s.quit())
             .button("Quit", |s| s.quit())
             .content(
