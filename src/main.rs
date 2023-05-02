@@ -1,4 +1,5 @@
 use cursive::Cursive;
+use cursive::views::EditView;
 use cursive::{
     theme::{BorderStyle, Palette},
     traits::*,
@@ -38,9 +39,11 @@ fn main() {
                     LinearLayout::horizontal()
                         .with(|row|{
                             for y in 1..27 {
+                                let c = y.clone();
+                                let r = i.clone();
                                 row.add_child(
                                     LinearLayout::horizontal()
-                                    .child(Button::new_raw(&format!("TEST"), Cursive::quit).fixed_width(3))
+                                    .child(Button::new_raw(" ", move |cursive| {edit_cell(cursive, r, c)}).with_name(format!("{r},{c}")).fixed_width(3))
                                     .child(DummyView)
                                 )
                             }
@@ -65,4 +68,34 @@ fn main() {
 
 
     cursive.run();
+}
+
+fn edit_cell(s: &mut Cursive, row: i32, col: i32) {
+
+    fn ok(s: &mut Cursive, new_cell: &str, row: i32, col: i32) {
+        s.call_on_name(&format!("{row},{col}"), |view: &mut Button| {
+            view.set_label_raw(new_cell)
+        });
+
+        s.pop_layer();
+    }
+
+    let mut cell_content = String::new();
+
+    s.call_on_name(&format!("{row},{col}"), |view: &mut Button| {
+        cell_content = String::from(view.label())
+    });
+
+    s.add_layer(
+        Dialog::new()
+        .content(EditView::new().content(cell_content).with_name("cell"))
+        .button("Ok", move |x|{
+            let new_cell_content = x.call_on_name("cell", |view: &mut EditView| {
+                view.get_content()
+            }).unwrap();
+
+            ok(x, &new_cell_content, row, col)
+        })
+        .button("Cancel", |x| { x.pop_layer(); })
+    )
 }
