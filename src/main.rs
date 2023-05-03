@@ -50,15 +50,14 @@ fn main() {
                         })
                 );
             }    
-        });
-
+        });    
 
     cursive.add_global_callback('q', |s| s.quit());
-    cursive.add_global_callback('s', |s| s.quit());
+    cursive.add_global_callback('s', save);
     cursive.add_layer(
         Dialog::new()
             .title("Quick exL")
-            .button("Save", |s| s.quit())
+            .button("Save", save)
             .button("Quit", |s| s.quit())
             .content(
                 LinearLayout::vertical()
@@ -110,4 +109,61 @@ fn edit_cell(s: &mut Cursive, row: i32, col: i32) {
         // })
         .button("Cancel", |x| { x.pop_layer(); })
     )
+}
+
+fn save(s: &mut Cursive) {
+
+    s.add_layer(
+        Dialog::new()
+        .title("Save as")
+        .content(
+            LinearLayout::vertical()
+            .child(TextView::new("File Path:"))
+            .child(
+                EditView::new()
+                .on_submit(|s, filepath| ok(s, filepath.to_string()))
+                .with_name("file_path")
+                .fixed_width(40)
+            )
+        )
+        .button("save", |s| {
+            let filepath = s.call_on_name("file_path", |view: &mut EditView| view.get_content()).unwrap();
+            ok(s, filepath.to_string());
+        })
+        .button("Cancel", |s| { s.pop_layer(); })
+    );
+
+    fn ok(s: &mut Cursive, file_path: String){
+        let mut content_array: Vec<Vec<String>> = Vec::new();
+
+        for row in 1..27 {
+            let mut row_vec: Vec<String> = Vec::new();
+            for col in 1..27 {
+                let mut cell_content = String::new();
+
+                s.call_on_name(&format!("{row},{col}"), |view: &mut Button| {
+                    cell_content = String::from(view.label())
+                });
+
+                row_vec.push(cell_content);
+
+                // if cell_content != " " {
+                //     row_vec.push(cell_content);
+                // }
+
+            }
+
+            if row_vec.is_empty() == false {
+                content_array.push(row_vec);
+            }
+        }
+
+        let mut csv_writer = csv::Writer::from_path(file_path + ".csv").unwrap();
+
+        for row in content_array {
+            csv_writer.write_record(row).unwrap(); 
+        }
+
+        s.quit()
+    }
 }

@@ -9,3 +9,4 @@ edition = "2021"
 cursive = { version = "0.20", default-features = false, features = ["crossterm-backend"] }
 crossterm = "0.26.1"
 rand = "0.8.5"
+csv = "1.2.1"
