@@ -3,7 +3,7 @@
 exL is a simple command-line interface (CLI) spreadsheet tool written in Rust, allowing users to create and edit spreadsheets in a terminal environment. It offers basic spreadsheet functionalities such as editing cell values, and saving the spreadsheet to a CSV file.
 
 <p align="center">
-  <img src="https://imgur.com/LN4ispF">
+  <img src="https://github.com/rmrz-daniel/exl/blob/main/demo/exl.gif">
 </p>
 
 ## Installation
