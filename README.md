@@ -24,7 +24,7 @@ Using exL is easy! Simply navigate to the cell you want to edit using the arrow 
 
 ## Future Improvements / Road map
 
-- ~~ Loading a CSV ~~ done!
+- ~~Loading a CSV~~ done!
 - Deleting Row/Columns ??
 - Online saving ??
 
