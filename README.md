@@ -12,6 +12,8 @@ To use exL, simply clone this repository to your local machine and run the follo
 
 `Cargo run`
 
+`Cargo run <path to existing csv>`
+
 This will launch the exL tool in your terminal.
 
 This is subject to change once fully released 
@@ -22,7 +24,7 @@ Using exL is easy! Simply navigate to the cell you want to edit using the arrow 
 
 ## Future Improvements / Road map
 
-- Loading a CSV
+- ~~ Loading a CSV ~~ done!
 - Deleting Row/Columns ??
 - Online saving ??
 
