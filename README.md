@@ -1,5 +1,7 @@
 # exL
-
+<p align="left">
+  <img width="128" height="128" src="https://raw.githubusercontent.com/rmrz-daniel/exl/main/demo/Logo.png">
+</p>
 exL is a simple command-line interface (CLI) spreadsheet tool written in Rust, allowing users to create and edit spreadsheets in a terminal environment.
 
 <p align="center">
