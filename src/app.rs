@@ -1,4 +1,4 @@
-use std::{vec, unimplemented};
+use std::{vec, collections::HashMap};
 
 
 
@@ -9,7 +9,7 @@ pub struct App {
 	pub undo_stack: Vec<GridState>,
 	pub selected_row: usize,
 	pub selected_col: usize,
-	pub selected_cells: Option<Vec<(usize,usize)>>,
+	pub selected_cells: Option<HashMap< (usize,usize), String >>,
 	pub current_mode: AppMode,
 	pub input: String,
 	pub cursor_pos: usize,
@@ -52,6 +52,14 @@ pub enum AppMode{
     Selecting
 }
 
+#[derive(Debug)]
+pub enum ArrowKeys {
+	Left,
+	Right,
+	Up,
+	Down,
+}
+
 impl App {
 	 pub fn new() -> Self {
 	 	Self::default()
@@ -83,39 +91,18 @@ impl App {
 	    self.undo_stack.push(cloned_grid);
     }
 
-	pub fn nav_up(&mut self) {
+	pub fn nav(&mut self, direction: ArrowKeys) {
+		let col_amount = self.grid.len();
+		let row_amount = self.grid[self.selected_row].len();
 
-		if self.selected_row == 0 {
-			self.selected_row = self.grid.len() - 1
-		} else {
-			self.selected_row -= 1
-		}
-		
-	}
 
-	pub fn nav_down(&mut self) {
-
-		if self.selected_row >= self.grid.len() - 1 {
-			self.selected_row = 0
-		} else {
-			self.selected_row += 1
-		};
-		
-	}
-
-	pub fn nav_left(&mut self) {
-		if self.selected_col == 0 {
-			self.selected_col = self.grid[self.selected_row].len() - 1
-		} else {
-			self.selected_col -= 1
-		}
-	}
-
-	pub fn nav_right(&mut self) {
-		if self.selected_col >= self.grid[self.selected_row].len() - 1 {
-			self.selected_col = 0
-		} else {
-			self.selected_col += 1
+		// If a % b = 0, it means a is evenly divisible by b. IE the start
+		// If a % b is less than b, it means a is not evenly divisible by b, and the remainder is less than b. IE always within range of [0, b-1]
+		match direction {
+		    ArrowKeys::Left => self.selected_col = (self.selected_col + row_amount - 1) % row_amount,
+		    ArrowKeys::Right => self.selected_col = (self.selected_col + 1) % row_amount,
+		    ArrowKeys::Up => self.selected_row = (self.selected_row + col_amount - 1) % col_amount,
+		    ArrowKeys::Down => self.selected_row = (self.selected_row + 1) % col_amount,
 		}
 	}
 
@@ -125,7 +112,7 @@ impl App {
 		self.selected_cells = None;
 	}
  
- 	//Edit functions v
+ 	// Edit functions v
 
  	pub fn edit(&mut self) {
  		self.input = self.grid[self.selected_row][self.selected_col].clone();
@@ -167,7 +154,23 @@ impl App {
 		self.quit_mode()
 	}
 
-	//Edit function ^
+	// Edit functions ^
+
+	// Select Functions v
+
+	pub fn select(&mut self) {
+		self.current_mode = AppMode::Selecting;
+		let mut cell_map: HashMap< (usize,usize) , String> = HashMap::new();
+		cell_map.insert( (self.selected_row, self.selected_col ), self.grid[self.selected_row][self.selected_col].clone() );
+		self.selected_cells = Some(cell_map);
+	}
+
+	pub fn select_nav(&mut self, direction: ArrowKeys) {
+		self.nav(direction);
+		self.selected_cells.as_mut().unwrap().insert((self.selected_row, self.selected_col ), self.grid[self.selected_row][self.selected_col].clone());
+	}
+
+	// Select Functions ^
 
     // pub fn add_row(&mut self, row_index: usize) {
     //     // Implementation for adding a row

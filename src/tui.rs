@@ -22,7 +22,10 @@ impl Tui {
 
   pub fn init(&mut self) -> Result<()> {
     terminal::enable_raw_mode()?;
-    crossterm::execute!(io::stderr(), EnterAlternateScreen)?;
+    crossterm::execute!(
+      io::stderr(),
+      EnterAlternateScreen,
+    )?;
 
     let panic_hook = panic::take_hook();
     panic::set_hook(Box::new(move |panic| {

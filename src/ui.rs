@@ -39,23 +39,43 @@ pub fn render(app: &mut App, f: &mut Frame) {
 
         for (col_index, cell) in row_data.iter().enumerate() {
 
-            let cell_style = if row_index == app.selected_row && col_index == app.selected_col {
-                Style::default().add_modifier(Modifier::REVERSED)
-            } else {
-                Style::default()
+            // let cell_style = {
+            //     if row_index == app.selected_row && col_index == app.selected_col{
+            //         Style::default().add_modifier(Modifier::REVERSED)
+            //     } else {
+            //         Style::default()
+            //     }
+            // };
+
+            let cell_style = match app.current_mode {
+                crate::app::AppMode::Selecting => {
+                    if app.selected_cells.as_ref().unwrap().contains_key( &(row_index, col_index)) {
+                        Style::default().bg(Color::Blue).fg(Color::White)
+                    } else {
+                        Style::default()
+                    }
+                },
+                _ => {
+                    if (row_index, col_index ) == (app.selected_row, app.selected_col){
+                        Style::default().add_modifier(Modifier::REVERSED)
+                    } else {
+                        Style::default()
+                    }
+                }
             };
 
             cells.push(Cell::from(cell.clone()).style(cell_style));
         }
 
-        rows.push(Row::new(cells));
+        rows.push(Row::new(cells).bottom_margin(0));
     }
 
     // let width: Vec<Constraint> = vec![Constraint::Percentage(100 / app.grid[0].len() as u16); app.grid[0].len()];
     let width: Vec<Constraint> = vec![Constraint::Percentage(100 / DEFAULT_COLS as u16); DEFAULT_COLS];
 
     let table = Table::new(rows)
-        .widths(&width);
+    .widths(&width)
+    .column_spacing(0);
 
 
     f.render_widget(container, f.size());
@@ -82,8 +102,20 @@ pub fn render(app: &mut App, f: &mut Frame) {
 
     f.render_widget(
         match app.current_mode {
-            crate::app::AppMode::Navigation | crate::app::AppMode::Selecting=> Paragraph::new(app.grid[app.selected_row][app.selected_col].as_str()),
-            crate::app::AppMode::Editing => Paragraph::new(app.input.to_owned()).set_style(Style::default().fg(Color::Yellow))
+            crate::app::AppMode::Navigation=> Paragraph::new(app.grid[app.selected_row][app.selected_col].as_str()),
+            crate::app::AppMode::Editing => Paragraph::new(app.input.to_owned()).set_style(Style::default().fg(Color::Yellow)),
+            crate::app::AppMode::Selecting => {
+
+                Paragraph::new( 
+                    app.selected_cells
+                    .clone()
+                    .unwrap()
+                    .iter()
+                    .map(|(_, y)| format!("{:?}", y))
+                    .collect::<Vec<String>>()
+                    .join(", ")
+                )
+            },
         }
         .block(
             Block::default()

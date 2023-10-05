@@ -6,6 +6,7 @@ pub mod update;
 
 use anyhow::Result;
 use app::App;
+
 use event::{Event, EventHandler};
 use ratatui::{backend::CrosstermBackend, Terminal};
 use tui::Tui;
@@ -19,6 +20,8 @@ fn main() -> Result<()> {
   let terminal = Terminal::new(backend)?;
   let events = EventHandler::new(250);
   let mut tui = Tui::new(terminal, events);
+
+
   tui.init()?;
 
   while !app.should_quit {
