@@ -41,6 +41,7 @@ pub fn update(app: &mut App, key_event: KeyEvent) {
         match key_event.code {
           KeyCode::Esc => app.quit(),
           KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => arrow_helper(app, key_event),
+          KeyCode::Char('z') => app.undo(),
           KeyCode::Enter => app.edit(),
           _ => {},
         };

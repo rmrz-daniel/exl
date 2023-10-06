@@ -76,21 +76,6 @@ impl App {
         self.selected_col = col;
     }
 
-    pub fn edit_cell(&mut self, content: &str) {
-
-    	let cloned_grid = GridState {
-        	grid: self.grid.clone(),
-    	};
-
-        self.grid[self.selected_row][self.selected_col] = content.to_string();
-
-    	if self.undo_stack.len() >= MAX_UNDO_LEVELS {
-	        self.undo_stack.remove(0);
-	    }
-	    
-	    self.undo_stack.push(cloned_grid);
-    }
-
 	pub fn nav(&mut self, direction: ArrowKeys) {
 		let col_amount = self.grid.len();
 		let row_amount = self.grid[self.selected_row].len();
@@ -149,9 +134,20 @@ impl App {
 	}
 
 	pub fn submit_changes(&mut self) {
+
+    	let cloned_grid = GridState {
+        	grid: self.grid.clone(),
+    	};
+
 		self.grid[self.selected_row][self.selected_col] = self.input.to_string();
 		self.cursor_pos = 0;
-		self.quit_mode()
+		self.quit_mode();
+
+    	if self.undo_stack.len() >= MAX_UNDO_LEVELS {
+	        self.undo_stack.remove(0);
+	    }
+	    
+	    self.undo_stack.push(cloned_grid);
 	}
 
 	// Edit functions ^
