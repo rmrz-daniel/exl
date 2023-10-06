@@ -161,13 +161,34 @@ impl App {
 	pub fn select(&mut self) {
 		self.current_mode = AppMode::Selecting;
 		let mut cell_map: HashMap< (usize,usize) , String> = HashMap::new();
+		
+		
 		cell_map.insert( (self.selected_row, self.selected_col ), self.grid[self.selected_row][self.selected_col].clone() );
+		
+
 		self.selected_cells = Some(cell_map);
 	}
 
 	pub fn select_nav(&mut self, direction: ArrowKeys) {
 		self.nav(direction);
+
 		self.selected_cells.as_mut().unwrap().insert((self.selected_row, self.selected_col ), self.grid[self.selected_row][self.selected_col].clone());
+
+		let (min_x, max_x, min_y, max_y) = self.selected_cells.as_ref().unwrap().iter().fold(None, |acc, ((x, y), _)| {
+		    match acc {
+		        None => Some((*x, *x, *y, *y)), //initialize to the first pair
+		        Some((min_x, max_x, min_y, max_y)) => Some((min_x.min(*x), max_x.max(*x), min_y.min(*y), max_y.max(*y))),
+		    }
+		}).unwrap();
+
+		for (row, row_vec) in self.grid.iter().enumerate() {
+			for (col, content) in row_vec.iter().enumerate() {
+				if !self.selected_cells.as_ref().unwrap().contains_key(&(row,col)) && row >= min_x && row <= max_x && col >= min_y && col <= max_y {
+					self.selected_cells.as_mut().unwrap().insert((row,col), content.clone());
+				}
+			}
+		}
+				
 	}
 
 	// Select Functions ^
