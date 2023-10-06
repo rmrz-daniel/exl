@@ -49,8 +49,10 @@ pub fn render(app: &mut App, f: &mut Frame) {
 
             let cell_style = match app.current_mode {
                 crate::app::AppMode::Selecting => {
-                    if app.selected_cells.as_ref().unwrap().contains_key( &(row_index, col_index)) {
+                    if app.selected_cells.as_ref().unwrap().contains_key( &(row_index, col_index)) && (row_index, col_index ) != (app.selected_row, app.selected_col) {
                         Style::default().bg(Color::Blue).fg(Color::White)
+                    } else if (row_index, col_index ) == (app.selected_row, app.selected_col) {
+                        Style::default().bg(Color::Blue).fg(Color::White).add_modifier(Modifier::REVERSED)
                     } else {
                         Style::default()
                     }
