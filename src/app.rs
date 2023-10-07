@@ -49,7 +49,10 @@ impl Default for App {
 pub enum AppMode{
     Navigation,
     Editing,
-    Selecting
+    Selecting,
+    SingleSelect,
+    FormulaInput,
+    Formula,
 }
 
 #[derive(Debug)]
@@ -165,6 +168,25 @@ impl App {
 		self.selected_cells = Some(cell_map);
 	}
 
+	pub fn singel_select(&mut self) {
+		self.current_mode = AppMode::SingleSelect;
+
+		match self.selected_cells {
+		    Some(_) => {
+				self.selected_cells.as_mut().unwrap().insert((self.selected_row, self.selected_col ), self.grid[self.selected_row][self.selected_col].clone());
+		    },
+		    None => {
+				let mut cell_map: HashMap< (usize,usize) , String> = HashMap::new();
+				cell_map.insert( (self.selected_row, self.selected_col ), self.grid[self.selected_row][self.selected_col].clone() );
+				self.selected_cells = Some(cell_map);
+		    },
+		}
+		
+		// cell_map.insert( (self.selected_row, self.selected_col ), self.grid[self.selected_row][self.selected_col].clone() );
+
+		// self.selected_cells = Some(cell_map);
+	}
+
 	pub fn select_nav(&mut self, direction: ArrowKeys) {
 		self.nav(direction);
 
@@ -188,6 +210,18 @@ impl App {
 	}
 
 	// Select Functions ^
+
+	// Formula Functions v
+
+	pub fn formula(&mut self) {
+		self.current_mode = AppMode::Formula;
+	}
+
+	pub fn formula_input(&mut self) {
+		self.current_mode = AppMode::FormulaInput;
+	}
+
+	// Formula Functions ^
 
     // pub fn add_row(&mut self, row_index: usize) {
     //     // Implementation for adding a row

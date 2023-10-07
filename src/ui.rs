@@ -39,16 +39,8 @@ pub fn render(app: &mut App, f: &mut Frame) {
 
         for (col_index, cell) in row_data.iter().enumerate() {
 
-            // let cell_style = {
-            //     if row_index == app.selected_row && col_index == app.selected_col{
-            //         Style::default().add_modifier(Modifier::REVERSED)
-            //     } else {
-            //         Style::default()
-            //     }
-            // };
-
             let cell_style = match app.current_mode {
-                crate::app::AppMode::Selecting => {
+                crate::app::AppMode::Selecting | crate::app::AppMode::Formula | crate::app::AppMode::SingleSelect | crate::app::AppMode::FormulaInput => {
                     if app.selected_cells.as_ref().unwrap().contains_key( &(row_index, col_index)) && (row_index, col_index ) != (app.selected_row, app.selected_col) {
                         Style::default().bg(Color::Blue).fg(Color::White)
                     } else if (row_index, col_index ) == (app.selected_row, app.selected_col) {
@@ -84,7 +76,7 @@ pub fn render(app: &mut App, f: &mut Frame) {
 
     f.render_widget(table,layout[0]);
 
-    if let crate::app::AppMode::Editing = app.current_mode {
+    if let crate::app::AppMode::Editing | crate::app::AppMode::FormulaInput = app.current_mode {
         f.set_cursor(menu_layout[1].x + app.cursor_pos as u16, menu_layout[1].y + 1);
     }
 
@@ -92,7 +84,8 @@ pub fn render(app: &mut App, f: &mut Frame) {
         match app.current_mode {
             crate::app::AppMode::Navigation => Paragraph::new("-- NAVIGATING --").set_style(Style::default().fg(Color::Green)),
             crate::app::AppMode::Editing => Paragraph::new("-- EDITING --").set_style(Style::default().fg(Color::Yellow)),
-            crate::app::AppMode::Selecting => Paragraph::new("-- SELECTING --").set_style(Style::default().fg(Color::Blue)),
+            crate::app::AppMode::Selecting | crate::app::AppMode::SingleSelect => Paragraph::new("-- SELECTING --").set_style(Style::default().fg(Color::Blue)),
+            crate::app::AppMode::Formula | crate::app::AppMode::FormulaInput => Paragraph::new("-- Formula --").set_style(Style::default().fg(Color::Magenta)),
         }
         .block(
             Block::default()
@@ -104,9 +97,10 @@ pub fn render(app: &mut App, f: &mut Frame) {
 
     f.render_widget(
         match app.current_mode {
-            crate::app::AppMode::Navigation=> Paragraph::new(app.grid[app.selected_row][app.selected_col].as_str()),
+            crate::app::AppMode::Navigation => Paragraph::new(app.grid[app.selected_row][app.selected_col].as_str()),
             crate::app::AppMode::Editing => Paragraph::new(app.input.to_owned()).set_style(Style::default().fg(Color::Yellow)),
-            crate::app::AppMode::Selecting => {
+            crate::app::AppMode::FormulaInput => Paragraph::new(app.input.to_owned()).set_style(Style::default().fg(Color::Magenta)), 
+            crate::app::AppMode::Selecting | crate::app::AppMode::Formula | crate::app::AppMode::SingleSelect=> {
 
                 Paragraph::new( 
                     app.selected_cells
