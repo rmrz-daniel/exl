@@ -13,7 +13,6 @@ use tui::Tui;
 use update::update;
 
 fn main() -> Result<()> {
-  let mut app = App::new();
 
   // Initialize the terminal user interface.
   let backend = CrosstermBackend::new(std::io::stderr());
@@ -21,6 +20,8 @@ fn main() -> Result<()> {
   let events = EventHandler::new(250);
   let mut tui = Tui::new(terminal, events);
 
+
+  let mut app = App::new();
 
   tui.init()?;
 
@@ -31,7 +32,7 @@ fn main() -> Result<()> {
     match tui.events.next()? {
       Event::Tick => {},
       Event::Key(key_event) => update(&mut app, key_event),
-      Event::Resize(_, _) => {},
+      Event::Resize(_, _) => {app.selected_row = 0; app.selected_col = 0;},
     };
   }
 

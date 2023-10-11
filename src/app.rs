@@ -64,15 +64,56 @@ pub enum ArrowKeys {
 }
 
 impl App {
-	 pub fn new() -> Self {
+	pub fn new() -> Self {
 	 	Self::default()
-	 }
+	}
 
-	 pub fn tick(&self) {}
+	pub fn rerender_grid(&mut self, width: u16, height: u16) {
+	    let cell_width = 12;
+	    let mut desired_width = (width / cell_width) as usize;
+	    let desired_height = height as usize;
 
-	 pub fn quit(&mut self) {
+	    // Handle extra column for remainder
+	    let has_remainder = width % cell_width != 0;
+
+	    // Adjust the number of rows
+	    if self.grid.len() < desired_height {
+	        // Add new rows
+	        let additional_rows = desired_height - self.grid.len();
+	        for _ in 0..additional_rows {
+	            self.grid.push(vec!["".to_string(); desired_width]);
+	        }
+	    } else if self.grid.len() > desired_height {
+	        // Remove extra rows
+	        self.grid.truncate(desired_height);
+	    }
+
+	    // Adjust the number of columns for each row
+	    for row in self.grid.iter_mut() {
+	        if has_remainder {
+	            // Add an extra column for the remainder
+	            row.push("".to_string());
+	            desired_width += 1;
+	        }
+
+	        if row.len() < desired_width {
+	            // Add new cells to the row
+	            let additional_cells = desired_width - row.len();
+	            for _ in 0..additional_cells {
+	                row.push("".to_string());
+	            }
+	        } else if row.len() > desired_width {
+	            // Remove extra cells from the row
+	            row.truncate(desired_width);
+	        }
+	    }
+	}
+
+	pub fn tick(&self) {}
+
+	pub fn quit(&mut self) {
 	 	self.should_quit = true;
-	 }
+	}
 
  	pub fn select_cell(&mut self, row: usize, col: usize) {
         self.selected_row = row;
