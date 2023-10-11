@@ -12,11 +12,20 @@ exL is a simple command-line interface (CLI) spreadsheet tool written in Rust, a
 
 ## Future Improvements / Road map
 
-- Selecting multiple rows
+- Selecting multiple rows ✅
 - Save to CSV
 - Loading CSV
 - Deleting Row/Columns
-- Excel formulas
+- Excel formula parser
+- Excel functions ( The stock functions may be subject to change )
+  - SUM
+  - COUNT
+  - COUNTIF
+  - IF
+  - AVERAGE
+  - MIN
+  - MAX
+  - SUMPRODUCT
 - WASM plugin support
 
 Stay tuned for updates!
