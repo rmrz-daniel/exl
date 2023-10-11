@@ -1,78 +1,83 @@
-use crate::{App, app::DEFAULT_COLS};
-use std::vec;
+use crate::{App};
+use crate::app::Cell as ExlCell;
+use std::{vec};
+use ratatui::widgets::Cell as RatatuiCell;
 use ratatui::{prelude::*, widgets::*};
 use crate::tui::Frame;
+
+
+fn get_style(cell: &ExlCell, row_index: usize, col_index: usize, app: &App) -> Style {
+    if cell.selected {
+        
+        return Style::default().bg(Color::Blue).fg(Color::White).add_modifier(
+            if (row_index, col_index ) == (app.selected_row, app.selected_col){
+                Modifier::REVERSED
+            } else {
+                Modifier::empty()
+            } 
+        );
+
+    } else {
+        return Style::default().add_modifier(
+            if (row_index, col_index ) == (app.selected_row, app.selected_col){
+                Modifier::REVERSED
+            } else {
+                Modifier::empty()
+            }  
+        );
+    };
+}
 
 pub fn render(app: &mut App, f: &mut Frame) {
 
     let container = Block::default()
-        .borders(Borders::ALL)
-        .title("exl")
-        .title_alignment(Alignment::Center);
+    .borders(Borders::ALL)
+    .title("exl")
+    .title_alignment(Alignment::Center);
 
     let layout = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints(
-            [
-                Constraint::Min(0),
-                Constraint::Length(2),
-            ]
-            .as_ref(),
+    .direction(Direction::Vertical)
+    .constraints(
+        [
+        Constraint::Min(0),
+        Constraint::Length(2),
+        ]
+        .as_ref(),
         )
-        .split(container.inner(f.size())); 
+    .split(container.inner(f.size())); 
 
     let menu_layout = Layout::default()
-    	.direction(Direction::Horizontal)
-    	.constraints(
-    		[
-                Constraint::Min(23),
-    			Constraint::Percentage(70),
-    			Constraint::Min(23),
-    		]
-    	)
-    	.split(layout[1]);	
+    .direction(Direction::Horizontal)
+    .constraints(
+      [
+      Constraint::Min(23),
+      Constraint::Percentage(70),
+      Constraint::Min(23),
+      ]
+      )
+    .split(layout[1]);	
 
-    app.rerender_grid(layout[0].width, layout[0].height);
-    let mut width: Vec<Constraint> = vec![Constraint::Length(12); app.grid[0].len()];
-    if layout[0].width & 12 != 0 {
-        width.push(Constraint::Length(layout[0].width & 12))
-    }
+    // app.rerender_grid(layout[0].width, layout[0].height);
+    // let mut width: Vec<Constraint> = vec![Constraint::Length(12); app.grid[0].len()];
+    // if layout[0].width & 12 != 0 {
+    //     width.push(Constraint::Length(layout[0].width & 12))
+    // }
 
 
     let mut rows: Vec<Row> = Vec::new();
 
     for (row_index, row_data) in app.grid.iter().enumerate() {
-        let mut cells = Vec::new();
+        let mut cells: Vec<RatatuiCell> = Vec::new();
 
         for (col_index, cell) in row_data.iter().enumerate() {
 
-            let cell_style = match app.current_mode {
-                crate::app::AppMode::Selecting | crate::app::AppMode::Formula | crate::app::AppMode::SingleSelect | crate::app::AppMode::FormulaInput => {
-                    if app.selected_cells.as_ref().unwrap().contains_key( &(row_index, col_index)) && (row_index, col_index ) != (app.selected_row, app.selected_col) {
-                        Style::default().bg(Color::Blue).fg(Color::White)
-                    } else if (row_index, col_index ) == (app.selected_row, app.selected_col) {
-                        Style::default().bg(Color::Blue).fg(Color::White).add_modifier(Modifier::REVERSED)
-                    } else {
-                        Style::default()
-                    }
-                },
-                _ => {
-                    if (row_index, col_index ) == (app.selected_row, app.selected_col){
-                        Style::default().add_modifier(Modifier::REVERSED)
-                    } else {
-                        Style::default()
-                    }
-                }
-            };
-
-            cells.push(Cell::from(cell.clone()).style(cell_style));
+            cells.push(RatatuiCell::from(cell.content.clone()).style(get_style(cell, row_index, col_index, app)));
         }
 
         rows.push(Row::new(cells).bottom_margin(0));
     }
 
-    // let width: Vec<Constraint> = vec![Constraint::Percentage(100 / app.grid[0].len() as u16); app.grid[0].len()];
-    // let width: Vec<Constraint> = vec![Constraint::Percentage(100 / DEFAULT_COLS as u16); DEFAULT_COLS];
+    let width: Vec<Constraint> = vec![Constraint::Percentage(100 / app.grid[0].len() as u16); app.grid[0].len()];
 
     let table = Table::new(rows)
     .widths(&width)
@@ -98,42 +103,34 @@ pub fn render(app: &mut App, f: &mut Frame) {
             Block::default()
             .borders(Borders::TOP)
             .border_style(Style::default().fg(Color::Reset))
-        ),
+            ),
         menu_layout[0],
-    );
+        );
 
     f.render_widget(
         match app.current_mode {
-            crate::app::AppMode::Navigation => Paragraph::new(app.grid[app.selected_row][app.selected_col].as_str()),
+            crate::app::AppMode::Navigation => Paragraph::new(app.grid[app.selected_row][app.selected_col].content.as_str()),
             crate::app::AppMode::Editing => Paragraph::new(app.input.to_owned()).set_style(Style::default().fg(Color::Yellow)),
             crate::app::AppMode::FormulaInput => Paragraph::new(app.input.to_owned()).set_style(Style::default().fg(Color::Magenta)), 
             crate::app::AppMode::Selecting | crate::app::AppMode::Formula | crate::app::AppMode::SingleSelect=> {
 
-                Paragraph::new( 
-                    app.selected_cells
-                    .clone()
-                    .unwrap()
-                    .iter()
-                    .map(|(_, y)| format!("{:?}", y))
-                    .collect::<Vec<String>>()
-                    .join(", ")
-                )
+                Paragraph::new("Temp")
             },
         }
         .block(
             Block::default()
             .borders(Borders::TOP)
             .border_style(Style::default().fg(Color::Reset))
-        ),
+            ),
         menu_layout[1],
-    );
+        );
 
     f.render_widget(
         Paragraph::new("Q - Menu | ESC - Exit")
         .block(
         	Block::default()
         	.borders(Borders::TOP)
-        ).alignment(Alignment::Right),
-       	menu_layout[2],
-    );
+            ).alignment(Alignment::Right),
+        menu_layout[2],
+        );
 }

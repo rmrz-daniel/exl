@@ -3,6 +3,7 @@ pub mod event;
 pub mod ui;
 pub mod tui;
 pub mod update;
+pub mod modes;
 
 use anyhow::Result;
 use app::App;
