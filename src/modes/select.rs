@@ -1,68 +1,61 @@
 use crate::app::ArrowKeys;
 use crate::app::App;
 use crate::app::AppMode;
+use crate::app::MinMaxRange;
+
+
 
 pub fn select_cell(app: &mut App, row: usize, col: usize) {
     app.selected_row = row;
     app.selected_col = col;
 }
 
-pub fn select(app: &mut App) {
-    app.current_mode = AppMode::Selecting;
 
-    // cell_map.insert(
-    //     (app.selected_row, app.selected_col),
-    //     app.grid[app.selected_row][app.selected_col].clone(),
-    // );
-
-}
-
-pub fn singel_select(app: &mut App) {
+pub fn single_select(app: &mut App) {
     app.current_mode = AppMode::SingleSelect;
     app.grid[app.selected_row][app.selected_col].selected = true;
 
 }
 
+pub fn select(app: &mut App) {
+    app.current_mode = AppMode::Selecting;
+
+    app.grid[app.selected_row][app.selected_col].selected = true;
+
+    //init the selected ranges
+    app.selected_range = Some(MinMaxRange { 
+        min_x: app.selected_row,
+        max_x: app.selected_row,
+        min_y: app.selected_col,
+        max_y: app.selected_col 
+    });
+
+}
+
 pub fn select_nav(app: &mut App, direction: ArrowKeys) {
     app.nav(direction);
+    app.grid[app.selected_row][app.selected_col].selected = true;
 
-    // app.selected_cells.as_mut().unwrap().insert(
-    //     (app.selected_row, app.selected_col),
-    //     app.grid[app.selected_row][app.selected_col].clone(),
-    // );
+    let mut range = app.selected_range.as_mut().unwrap();
 
-    // let (min_x, max_x, min_y, max_y) = app
-    //     .selected_cells
-    //     .as_ref()
-    //     .unwrap()
-    //     .iter()
-    //     .fold(None, |acc, ((x, y), _)| {
-    //         match acc {
-    //             None => Some((*x, *x, *y, *y)), //initialize to the first pair
-    //             Some((min_x, max_x, min_y, max_y)) => {
-    //                 Some((min_x.min(*x), max_x.max(*x), min_y.min(*y), max_y.max(*y)))
-    //             }
-    //         }
-    //     })
-    //     .unwrap();
+    // Update ranges after new cell is selected
+    app.selected_range = Some(MinMaxRange { 
+        min_x: range.min_x.min(app.selected_row),
+        max_x: range.max_x.max(app.selected_row),
+        min_y: range.min_y.min(app.selected_col),
+        max_y: range.max_y.max(app.selected_col) 
+    });
 
-    // for (row, row_vec) in app.grid.iter().enumerate() {
-    //     for (col, content) in row_vec.iter().enumerate() {
-    //         if !app
-    //             .selected_cells
-    //             .as_ref()
-    //             .unwrap()
-    //             .contains_key(&(row, col))
-    //             && row >= min_x
-    //             && row <= max_x
-    //             && col >= min_y
-    //             && col <= max_y
-    //         {
-    //             app.selected_cells
-    //                 .as_mut()
-    //                 .unwrap()
-    //                 .insert((row, col), content.clone());
-    //         }
-    //     }
-    // }
+    range = app.selected_range.as_mut().unwrap();
+
+
+    // Traverse the grid in the selected range flip all those cells as selected
+    for row in &mut app.grid[range.min_x..=range.max_x] {
+
+        for cell in &mut row[range.min_y..=range.max_y] {
+            cell.selected = true;
+        }
+
+    }
+
 }

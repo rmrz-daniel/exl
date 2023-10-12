@@ -46,7 +46,7 @@ pub fn update(app: &mut App, key_event: KeyEvent) {
                 // KeyCode::Char('z') => app.undo(),
                 KeyCode::Enter => {
                     if key_event.modifiers == KeyModifiers::CONTROL {
-                        singel_select(app)
+                        single_select(app)
                     } else {
                         edit(app)
                     }
@@ -77,7 +77,7 @@ pub fn update(app: &mut App, key_event: KeyEvent) {
         crate::app::AppMode::SingleSelect => {
             match key_event.code {
                 KeyCode::Esc => app.quit_mode(),
-                KeyCode::Enter => singel_select(app),
+                KeyCode::Enter => single_select(app),
                 KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => {
                     arrow_helper(app, key_event)
                 }
