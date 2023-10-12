@@ -33,14 +33,13 @@ pub struct MinMaxRange {
     pub max_y: usize,
 }
 
-pub const DEFAULT_ROWS: usize = 30;
-pub const DEFAULT_COLS: usize = 10;
+pub const CELL_WIDTH: usize = 12;
 
 impl Default for App {
     fn default() -> Self {
         App {
             should_quit: false,
-            grid: vec![vec![Cell::default(); DEFAULT_COLS]; DEFAULT_ROWS],
+            grid: vec![vec![Cell::default(); 0]; 0],
             undo_stack: vec![],
             selected_row: 0,
             selected_col: 0,
@@ -89,7 +88,20 @@ pub enum ArrowKeys {
 
 impl App {
     pub fn new() -> Self {
-        Self::default()
+    	App::default()
+    }
+
+    pub fn init_table_grid(&mut self, width: u16, height: u16){
+    	//Hard coded the values of 2 and 4 for the margins for now
+    	let w: usize = (width - 2).into();
+    	let h: usize = (height - 4).into();
+
+    	if w % CELL_WIDTH != 0 {
+    		self.grid = vec![vec![Cell::default(); w / CELL_WIDTH + 1]; h as usize];
+    	} else {
+    		self.grid = vec![vec![Cell::default(); w / CELL_WIDTH]; h as usize];
+    	}
+
     }
 
     // pub fn rerender_grid(&mut self, width: u16, height: u16) {

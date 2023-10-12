@@ -56,12 +56,11 @@ pub fn render(app: &mut App, f: &mut Frame) {
       ]
       )
     .split(layout[1]);	
-
-    // app.rerender_grid(layout[0].width, layout[0].height);
-    // let mut width: Vec<Constraint> = vec![Constraint::Length(12); app.grid[0].len()];
-    // if layout[0].width & 12 != 0 {
-    //     width.push(Constraint::Length(layout[0].width & 12))
-    // }
+    
+    let mut width: Vec<Constraint> = vec![Constraint::Length(12); app.grid[0].len()];
+    if layout[0].width & 12 != 0 {
+        width.push(Constraint::Length(layout[0].width & 12))
+    }
 
 
     let mut rows: Vec<Row> = Vec::new();
@@ -77,7 +76,7 @@ pub fn render(app: &mut App, f: &mut Frame) {
         rows.push(Row::new(cells).bottom_margin(0));
     }
 
-    let width: Vec<Constraint> = vec![Constraint::Percentage(100 / app.grid[0].len() as u16); app.grid[0].len()];
+    // let width: Vec<Constraint> = vec![Constraint::Percentage(100 / app.grid[0].len() as u16); app.grid[0].len()];
 
     let table = Table::new(rows)
     .widths(&width)

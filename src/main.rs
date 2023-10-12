@@ -24,7 +24,7 @@ fn main() -> Result<()> {
 
   let mut app = App::new();
 
-  tui.init()?;
+  tui.init(&mut app)?;
 
   while !app.should_quit {
     // Render the user interface.
