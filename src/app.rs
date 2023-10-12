@@ -7,6 +7,7 @@ pub struct App {
     pub undo_stack: Vec<GridState>,
     pub selected_row: usize,
     pub selected_col: usize,
+    pub selected_range: Option<MinMaxRange>,
     pub current_mode: AppMode,
     pub input: String,
     pub cursor_pos: usize,
@@ -14,7 +15,7 @@ pub struct App {
 
 #[derive(Debug, Clone)]
 pub struct GridState {
-    pub grid: Vec<Vec<String>>,
+    pub grid: Vec<Vec<Cell>>,
 }
 
 #[derive(Debug)]
@@ -22,6 +23,14 @@ pub struct GridState {
 pub struct Cell {
 	pub content: String,
 	pub selected: bool
+}
+
+#[derive(Debug)]
+pub struct MinMaxRange {
+    pub min_x: usize,
+    pub max_x: usize,
+    pub min_y: usize,
+    pub max_y: usize,
 }
 
 pub const DEFAULT_ROWS: usize = 30;
@@ -35,6 +44,7 @@ impl Default for App {
             undo_stack: vec![],
             selected_row: 0,
             selected_col: 0,
+            selected_range: None,
             input: "".to_string(),
             cursor_pos: 0,
             current_mode: AppMode::Navigation,
@@ -146,6 +156,7 @@ impl App {
     pub fn quit_mode(&mut self) {
         self.current_mode = AppMode::Navigation;
         self.input.clear();
+        self.selected_range = None;
         Cell::reset_selected(&mut self.grid);
     }
 
@@ -161,9 +172,9 @@ impl App {
 
     // Formula Functions ^
 
-    // pub fn undo(&mut self) {
-    //     if let Some(previous_state) = self.undo_stack.pop() {
-    //         self.grid = previous_state.grid;
-    //     }
-    // }
+    pub fn undo(&mut self) {
+        if let Some(previous_state) = self.undo_stack.pop() {
+            self.grid = previous_state.grid;
+        }
+    }
 }

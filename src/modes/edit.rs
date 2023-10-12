@@ -39,17 +39,17 @@ pub fn del_char(app: &mut App) {
 }
 
 pub fn submit_changes(app: &mut App) {
-    // let cloned_grid = GridState {
-    //     grid: app.grid.clone(),
-    // };
+    let cloned_grid = GridState {
+        grid: app.grid.clone(),
+    };
 
     app.grid[app.selected_row][app.selected_col].content = app.input.to_string();
     app.cursor_pos = 0;
     app.quit_mode();
 
-    // if app.undo_stack.len() >= MAX_UNDO_LEVELS {
-    //     app.undo_stack.remove(0);
-    // }
+    if app.undo_stack.len() >= MAX_UNDO_LEVELS {
+        app.undo_stack.remove(0);
+    }
 
-    // app.undo_stack.push(cloned_grid);
+    app.undo_stack.push(cloned_grid);
 }
