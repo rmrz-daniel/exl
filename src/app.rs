@@ -79,7 +79,6 @@ pub enum AppMode {
     Editing,
     Selecting,
     SingleSelect,
-    FormulaInput,
     Formula,
 }
 
@@ -198,18 +197,6 @@ impl App {
         self.selected_range = None;
         Cell::reset_selected(&mut self.grid);
     }
-
-    // Formula Functions v
-
-    pub fn formula(&mut self) {
-        self.current_mode = AppMode::Formula;
-    }
-
-    pub fn formula_input(&mut self) {
-        self.current_mode = AppMode::FormulaInput;
-    }
-
-    // Formula Functions ^
 
     pub fn undo(&mut self) {
         if let Some(previous_state) = self.undo_stack.pop() {

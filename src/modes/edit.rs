@@ -26,6 +26,8 @@ fn clamp(app: &mut App, new_pos: usize) -> usize {
 pub fn enter_char(app: &mut App, new_char: char) {
     app.input.insert(app.cursor_pos, new_char);
     cursor_right(app);
+
+    check_for_equals(app);
 }
 
 pub fn del_char(app: &mut App) {
@@ -36,6 +38,9 @@ pub fn del_char(app: &mut App) {
         app.input = left_of_del.chain(right_of_del).collect();
         cursor_left(app);
     }
+
+    check_for_equals(app);
+
 }
 
 pub fn submit_changes(app: &mut App) {
@@ -52,4 +57,12 @@ pub fn submit_changes(app: &mut App) {
     }
 
     app.undo_stack.push(cloned_grid);
+}
+
+fn check_for_equals(app: &mut App) {
+    if !app.input.starts_with('=') {
+        app.current_mode = AppMode::Editing;
+    } else {
+        app.current_mode = AppMode::Formula;
+    }
 }

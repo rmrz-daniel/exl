@@ -1,6 +1,6 @@
-use crate::app::Cell;
+use std::todo;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
-use crate::app::CELL_WIDTH;
+use crate::app::AppMode;
 use crate::modes::edit::*;
 use crate::modes::select::*;
 use crate::app::App;
@@ -24,7 +24,7 @@ fn arrow_helper(app: &mut App, key_event: KeyEvent) {
                 KeyCode::Up => select_nav(app, crate::app::ArrowKeys::Up),
                 _ => {}
             },
-            crate::app::AppMode::Editing | crate::app::AppMode::FormulaInput => {
+            crate::app::AppMode::Editing => {
                 match key_event.code {
                     KeyCode::Right => cursor_right(app),
                     KeyCode::Left => cursor_left(app),
@@ -70,7 +70,6 @@ pub fn update(app: &mut App, key_event: KeyEvent) {
             match key_event.code {
                 KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => arrow_helper(app, key_event),
                 KeyCode::Esc => app.quit_mode(),
-                KeyCode::Char('F') => app.formula(),
                 _ => {}
             };
         }
@@ -79,23 +78,14 @@ pub fn update(app: &mut App, key_event: KeyEvent) {
                 KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => arrow_helper(app, key_event),
                 KeyCode::Esc => app.quit_mode(),
                 KeyCode::Enter => single_select(app),
-                KeyCode::Char('F') => app.formula(),
                 _ => {}
             };
         }
         crate::app::AppMode::Formula => {
             match key_event.code {
-                KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => arrow_helper(app, key_event),
-                KeyCode::Esc => app.quit_mode(),
-                KeyCode::Enter => app.formula_input(),
-                _ => {}
-            };
-        }
-        crate::app::AppMode::FormulaInput => {
-            match key_event.code {
                 KeyCode::Right | KeyCode::Left => arrow_helper(app, key_event),
                 KeyCode::Esc => app.quit_mode(),
-                KeyCode::Enter => submit_changes(app),
+                KeyCode::Enter => todo!(),
                 KeyCode::Backspace => del_char(app),
                 KeyCode::Char(n) => enter_char(app, n),
                 _ => {}
