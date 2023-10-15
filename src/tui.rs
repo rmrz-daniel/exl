@@ -33,7 +33,7 @@ impl Tui {
       panic_hook(panic);
     }));
     
-    app.init_table_grid(self.terminal.size().unwrap().width, self.terminal.size().unwrap().height);
+    app.header();
 
     self.terminal.hide_cursor()?;
     self.terminal.clear()?;

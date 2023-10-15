@@ -1,4 +1,5 @@
 use crate::{App};
+use crate::app::CELL_WIDTH;
 use crate::app::Cell as ExlCell;
 use std::{vec};
 use ratatui::widgets::Cell as RatatuiCell;
@@ -7,8 +8,13 @@ use crate::tui::Frame;
 
 
 fn get_style(cell: &ExlCell, row_index: usize, col_index: usize, app: &App) -> Style {
-    if cell.selected {
-        
+
+    if cell.header {
+        return Style::default().bg(Color::LightYellow).fg(Color::White);
+    }
+
+
+    if cell.selected {  
         return Style::default().bg(Color::Blue).fg(Color::White).add_modifier(
             if (row_index, col_index ) == (app.selected_row, app.selected_col){
                 Modifier::REVERSED
@@ -56,27 +62,63 @@ pub fn render(app: &mut App, f: &mut Frame) {
       ]
       )
     .split(layout[1]);	
-    
-    let mut width: Vec<Constraint> = vec![Constraint::Length(12); app.grid[0].len()];
-    if layout[0].width & 12 != 0 {
-        width.push(Constraint::Length(layout[0].width & 12))
+
+    let mut width: Vec<Constraint> = vec![Constraint::Length(CELL_WIDTH as u16); ((layout[0].width - 3) / CELL_WIDTH) as usize];
+    width.insert(0, Constraint::Length(3));
+
+    if (layout[0].width - 3) % CELL_WIDTH != 0 {
+        width.push(Constraint::Length( (layout[0].width - 3) % CELL_WIDTH))
     }
+
+        // Calculate the visual amount of cells displayed
+        {
+           let x = if layout[0].width % CELL_WIDTH != 0 {
+                (layout[0].width / CELL_WIDTH) + 2
+            } else {
+                layout[0].width / CELL_WIDTH + 1
+            };
+
+            app.cell_amount = (x as usize, layout[0].height as usize); 
+        }
 
 
     let mut rows: Vec<Row> = Vec::new();
 
-    for (row_index, row_data) in app.grid.iter().enumerate() {
+    //Top header
+    {
         let mut cells: Vec<RatatuiCell> = Vec::new();
 
-        for (col_index, cell) in row_data.iter().enumerate() {
+        cells.push(RatatuiCell::from(app.grid[0][0].content.clone()).style(get_style(&app.grid[0][0], 0, 0, app)));
 
-            cells.push(RatatuiCell::from(cell.content.clone()).style(get_style(cell, row_index, col_index, app)));
+        for (col_index, cell) in app.grid[0].iter().skip(app.view_bound.0 + 1).take(app.cell_amount.0).enumerate() {
+
+            let adjusted_col_index = col_index + app.view_bound.0;
+
+            cells.push(RatatuiCell::from(cell.content.clone()).style(get_style(cell, 0, adjusted_col_index, app)));
+        }
+
+        rows.push(Row::new(cells).bottom_margin(0));
+
+    }
+
+
+    for (row_index, row_data) in app.grid.iter().skip(app.view_bound.1 + 1).take(app.cell_amount.1).enumerate() {
+        let mut cells: Vec<RatatuiCell> = Vec::new();
+
+        cells.push(RatatuiCell::from(app.grid[row_index + app.view_bound.1 + 1][0].content.clone()).style(get_style(&app.grid[row_index + app.view_bound.1 + 1][0], row_index + app.view_bound.1, 0, app)));
+
+        for (col_index, cell) in row_data.iter().skip(app.view_bound.0 + 1).take(app.cell_amount.0).enumerate() {
+
+            let adjusted_row_index = row_index + app.view_bound.1 + 1;
+            let adjusted_col_index = col_index + app.view_bound.0 + 1;
+
+            cells.push(RatatuiCell::from(cell.content.clone()).style(get_style(cell, adjusted_row_index, adjusted_col_index, app)));
         }
 
         rows.push(Row::new(cells).bottom_margin(0));
     }
 
-    // let width: Vec<Constraint> = vec![Constraint::Percentage(100 / app.grid[0].len() as u16); app.grid[0].len()];
+    
 
     let table = Table::new(rows)
     .widths(&width)

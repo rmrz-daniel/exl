@@ -11,7 +11,7 @@ use app::App;
 use event::{Event, EventHandler};
 use ratatui::{backend::CrosstermBackend, Terminal};
 use tui::Tui;
-use update::update;
+use update::{update};
 
 fn main() -> Result<()> {
 
@@ -33,7 +33,7 @@ fn main() -> Result<()> {
     match tui.events.next()? {
       Event::Tick => {},
       Event::Key(key_event) => update(&mut app, key_event),
-      Event::Resize(_, _) => {app.selected_row = 0; app.selected_col = 0;},
+      Event::Resize(_,_) => {},
     };
   }
 
