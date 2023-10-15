@@ -7,7 +7,7 @@ exL is a simple command-line interface (CLI) spreadsheet tool written in Rust, a
 <br/>
 
 <p align="left">
-  <img src="https://github.com/rmrz-daniel/exl/blob/main/demo/exl.gif">
+  <img src="https://github.com/rmrz-daniel/exl/blob/main/demo/demo.gif">
 </p>
 
 ## Future Improvements / Road map
