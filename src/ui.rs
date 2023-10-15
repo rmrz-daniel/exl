@@ -10,7 +10,7 @@ use crate::tui::Frame;
 fn get_style(cell: &ExlCell, row_index: usize, col_index: usize, app: &App) -> Style {
 
     if cell.header {
-        return Style::default().bg(Color::LightYellow).fg(Color::White);
+        return Style::default().add_modifier(Modifier::REVERSED);
     }
 
 
