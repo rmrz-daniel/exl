@@ -152,9 +152,26 @@ pub fn render(app: &mut App, f: &mut Frame) {
         match app.current_mode {
             crate::app::AppMode::Navigation => Paragraph::new(app.grid[app.selected_row][app.selected_col].content.as_str()),
             crate::app::AppMode::Editing | crate::app::AppMode::Formula  => Paragraph::new(app.input.to_owned()).set_style(Style::default().fg(Color::Yellow)),
-            crate::app::AppMode::Selecting | crate::app::AppMode::SingleSelect=> {
+            crate::app::AppMode::Selecting => Paragraph::new(
+                App::index_to_excel_column(app.selected_range.as_ref().unwrap().min_y - 1) 
+                + &app.selected_range.as_ref().unwrap().min_x.to_string() 
+                + ":" 
+                + &App::index_to_excel_column(app.selected_range.as_ref().unwrap().max_y - 1) 
+                + &app.selected_range.as_ref().unwrap().max_x.to_string()
+            ),
+            crate::app::AppMode::SingleSelect => {
 
-                Paragraph::new("Temp")
+                let mut range = String::new();
+
+                for (row_index, row) in app.grid.iter().enumerate() {
+                    for (col_index, col) in row.iter().skip(1).enumerate() {
+                        if col.selected {
+                            range.push_str(&(App::index_to_excel_column(col_index) + &row_index.to_string() + ":"))
+                        }
+                    }
+                }
+
+                Paragraph::new(range)
             },
         }
         .block(
