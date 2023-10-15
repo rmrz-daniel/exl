@@ -1,7 +1,7 @@
 use std::{
-  sync::mpsc,
-  thread,
-  time::{Duration, Instant},
+	sync::mpsc,
+	thread,
+	time::{Duration, Instant},
 };
 
 use anyhow::Result;
@@ -38,17 +38,18 @@ impl EventHandler {
 				loop {
 					let timeout = tick_rate.checked_sub(last_tick.elapsed()).unwrap_or(tick_rate);
 
-			        if event::poll(timeout).expect("no events available") {
-			        	match event::read().expect("unable to read event") {
-			            	CrosstermEvent::Key(e) => match e.kind {
-			            		event::KeyEventKind::Press => sender.send(Event::Key(e)),
-			                    _ => Ok(()),
-			            	},
-			            	CrosstermEvent::Resize(w, h) => sender.send(Event::Resize(w, h)),
-			            	_ => Ok(())
-			        	}
-			        .expect("failed to send terminal event")
-			        }
+					if event::poll(timeout).expect("no events available") {
+						match event::read().expect("unable to read event") {
+							CrosstermEvent::Key(e) => 
+							match e.kind {
+								event::KeyEventKind::Press => sender.send(Event::Key(e)),
+								_ => Ok(()),
+							},
+							CrosstermEvent::Resize(w, h) => sender.send(Event::Resize(w, h)),
+							_ => Ok(())
+						}
+						.expect("failed to send terminal event")
+					}
 
 					if last_tick.elapsed() >= tick_rate {
 						sender.send(Event::Tick).expect("failed to send tick event");

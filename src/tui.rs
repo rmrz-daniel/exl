@@ -20,7 +20,7 @@ impl Tui {
     Self { terminal, events }
   }
 
-  pub fn init(&mut self) -> Result<()> {
+  pub fn init(&mut self, app: &mut App) -> Result<()> {
     terminal::enable_raw_mode()?;
     crossterm::execute!(
       io::stderr(),
@@ -32,6 +32,8 @@ impl Tui {
       Self::reset().expect("failed to reset the terminal");
       panic_hook(panic);
     }));
+    
+    app.header();
 
     self.terminal.hide_cursor()?;
     self.terminal.clear()?;
@@ -39,7 +41,7 @@ impl Tui {
   }
 
   pub fn draw(&mut self, app: &mut App) -> Result<()> {
-    self.terminal.draw(|frame| ui::render(app, frame))?;
+    self.terminal.draw(|frame| ui::render(app, frame) )?;
     Ok(())
   }
 
