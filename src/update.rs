@@ -1,6 +1,5 @@
 use std::todo;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
-use crate::app::AppMode;
 use crate::modes::edit::*;
 use crate::modes::select::*;
 use crate::app::App;
