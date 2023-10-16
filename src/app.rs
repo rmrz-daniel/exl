@@ -104,9 +104,9 @@ impl App {
     }
 
     pub fn index_to_excel_column(index: usize) -> String {
-        if index == 0 {
-            return String::from("A");
-        }
+        // if index == 0 {
+        //     return String::from("A");
+        // }
 
         let mut result = String::new();
         let mut n = index + 1;
