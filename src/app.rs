@@ -1,5 +1,4 @@
-
-use std::{vec};
+use std::vec;
 
 #[derive(Debug)]
 pub struct App {
@@ -13,7 +12,7 @@ pub struct App {
     pub input: String,
     pub cursor_pos: usize,
     pub view_bound: (usize, usize),
-    pub cell_amount: (usize, usize)
+    pub cell_amount: (usize, usize),
 }
 
 #[derive(Debug, Clone)]
@@ -21,12 +20,11 @@ pub struct GridState {
     pub grid: Vec<Vec<Cell>>,
 }
 
-#[derive(Debug)]
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Cell {
-	pub content: String,
-	pub selected: bool,
-	pub header: bool,
+    pub content: String,
+    pub selected: bool,
+    pub header: bool,
 }
 
 #[derive(Debug)]
@@ -51,26 +49,30 @@ impl Default for App {
             input: "".to_string(),
             cursor_pos: 0,
             current_mode: AppMode::Navigation,
-            view_bound: (0,0),
-            cell_amount: (0,0),
+            view_bound: (0, 0),
+            cell_amount: (0, 0),
         }
     }
 }
 
 impl Default for Cell {
-	fn default() -> Self {
-		Cell { content: "".to_string(), selected: false, header: false}
+    fn default() -> Self {
+        Cell {
+            content: "".to_string(),
+            selected: false,
+            header: false,
+        }
     }
 }
 
 impl Cell {
-	fn reset_selected(cells: &mut Vec<Vec<Cell>>) {
-		for row in cells.iter_mut() {
-			for cell in row.iter_mut() {
-				cell.selected = false;
-			}
-		}
-	}
+    fn reset_selected(cells: &mut Vec<Vec<Cell>>) {
+        for row in cells.iter_mut() {
+            for cell in row.iter_mut() {
+                cell.selected = false;
+            }
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -90,10 +92,9 @@ pub enum ArrowKeys {
     Down,
 }
 
-
 impl App {
     pub fn new() -> Self {
-    	App::default()
+        App::default()
     }
 
     pub fn tick(&self) {}
@@ -103,47 +104,49 @@ impl App {
     }
 
     pub fn index_to_excel_column(index: usize) -> String {
-	    if index == 0 {
-	        return String::from("A");
-	    }
+        if index == 0 {
+            return String::from("A");
+        }
 
-	    let mut result = String::new();
-	    let mut n = index + 1;
+        let mut result = String::new();
+        let mut n = index + 1;
 
-	    while n > 0 {
-	        n -= 1;
-	        let remainder = n % 26;
-	        let letter = (remainder as u8 + b'A') as char;
-	        result.push(letter);
-	        n /= 26;
-	    }
+        while n > 0 {
+            n -= 1;
+            let remainder = n % 26;
+            let letter = (remainder as u8 + b'A') as char;
+            result.push(letter);
+            n /= 26;
+        }
 
-	    result.chars().rev().collect()
-	}
+        result.chars().rev().collect()
+    }
 
-	pub fn header(&mut self) {
+    pub fn header(&mut self) {
+        for (index, cell) in self.grid[0].iter_mut().skip(1).enumerate() {
+            cell.content = Self::index_to_excel_column(index);
+            cell.header = true;
+        }
 
-		for (index, cell) in self.grid[0].iter_mut().skip(1).enumerate() {
-			cell.content = Self::index_to_excel_column(index);
-			cell.header = true;
-		}
-
-		for (index, row) in self.grid.iter_mut().enumerate() {
-			if index != 0 { row[0].content =  index.to_string() };
-			row[0].header = true;
-		}
-
-	}
+        for (index, row) in self.grid.iter_mut().enumerate() {
+            if index != 0 {
+                row[0].content = index.to_string()
+            };
+            row[0].header = true;
+        }
+    }
 
     pub fn insert_row(&mut self, index: usize) {
-    	let col_count = self.grid.first().unwrap().len();
-    	self.grid.insert(index, vec![Cell::default(); col_count] );
-    	self.header()
+        let col_count = self.grid.first().unwrap().len();
+        self.grid.insert(index, vec![Cell::default(); col_count]);
+        self.header()
     }
 
     pub fn insert_col(&mut self, index: usize) {
-    	self.grid.iter_mut().for_each(|row| row.insert(index, Cell::default()));
-    	self.header()
+        self.grid
+            .iter_mut()
+            .for_each(|row| row.insert(index, Cell::default()));
+        self.header()
     }
 
     pub fn nav(&mut self, direction: ArrowKeys) {
@@ -152,30 +155,29 @@ impl App {
 
         match direction {
             ArrowKeys::Left => {
-            	if self.selected_col > 1 {
-            		self.selected_col -= 1;
-            	} else {
-            		self.view_bound.0 = 0;
-            	}
-            },
+                if self.selected_col > 1 {
+                    self.selected_col -= 1;
+                } else {
+                    self.view_bound.0 = 0;
+                }
+            }
             ArrowKeys::Right => {
-            	if self.selected_col < col_amount - 1 {
-            		self.selected_col += 1;
-            	}
-            },
+                if self.selected_col < col_amount - 1 {
+                    self.selected_col += 1;
+                }
+            }
             ArrowKeys::Up => {
-            	if self.selected_row > 1 {
-            		self.selected_row -= 1;
-            	} else {
-            		self.view_bound.1 = 0;
-
-            	}
-            },
+                if self.selected_row > 1 {
+                    self.selected_row -= 1;
+                } else {
+                    self.view_bound.1 = 0;
+                }
+            }
             ArrowKeys::Down => {
-            	if self.selected_row < row_amount - 1 {
-            		self.selected_row += 1;
-            	}
-            },
+                if self.selected_row < row_amount - 1 {
+                    self.selected_row += 1;
+                }
+            }
         }
 
         if self.selected_col < self.view_bound.0 {
@@ -189,7 +191,7 @@ impl App {
         } else if self.selected_row >= self.view_bound.1 + self.cell_amount.1 {
             self.view_bound.1 = self.selected_row - self.cell_amount.1 + 1;
         }
-	}
+    }
     pub fn quit_mode(&mut self) {
         self.current_mode = AppMode::Navigation;
         self.input.clear();

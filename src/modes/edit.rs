@@ -1,7 +1,6 @@
-use crate::app::GridState;
 use crate::app::App;
 use crate::app::AppMode;
-
+use crate::app::GridState;
 
 const MAX_UNDO_LEVELS: usize = 7;
 
@@ -40,7 +39,6 @@ pub fn del_char(app: &mut App) {
     }
 
     check_for_equals(app);
-
 }
 
 pub fn submit_changes(app: &mut App) {

@@ -1,15 +1,17 @@
-use std::todo;
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+use crate::app::App;
 use crate::modes::edit::*;
 use crate::modes::select::*;
-use crate::app::App;
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+use std::todo;
 
 fn arrow_helper(app: &mut App, key_event: KeyEvent) {
     if key_event.modifiers == KeyModifiers::SHIFT {
         select(app)
     } else {
         match app.current_mode {
-            crate::app::AppMode::Navigation | crate::app::AppMode::Formula | crate::app::AppMode::SingleSelect => match key_event.code {
+            crate::app::AppMode::Navigation
+            | crate::app::AppMode::Formula
+            | crate::app::AppMode::SingleSelect => match key_event.code {
                 KeyCode::Right => app.nav(crate::app::ArrowKeys::Right),
                 KeyCode::Left => app.nav(crate::app::ArrowKeys::Left),
                 KeyCode::Down => app.nav(crate::app::ArrowKeys::Down),
@@ -23,13 +25,11 @@ fn arrow_helper(app: &mut App, key_event: KeyEvent) {
                 KeyCode::Up => select_nav(app, crate::app::ArrowKeys::Up),
                 _ => {}
             },
-            crate::app::AppMode::Editing => {
-                match key_event.code {
-                    KeyCode::Right => cursor_right(app),
-                    KeyCode::Left => cursor_left(app),
-                    _ => {}
-                }
-            }
+            crate::app::AppMode::Editing => match key_event.code {
+                KeyCode::Right => cursor_right(app),
+                KeyCode::Left => cursor_left(app),
+                _ => {}
+            },
         }
     }
 }
@@ -67,14 +67,18 @@ pub fn update(app: &mut App, key_event: KeyEvent) {
         }
         crate::app::AppMode::Selecting => {
             match key_event.code {
-                KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => arrow_helper(app, key_event),
+                KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => {
+                    arrow_helper(app, key_event)
+                }
                 KeyCode::Esc => app.quit_mode(),
                 _ => {}
             };
         }
         crate::app::AppMode::SingleSelect => {
             match key_event.code {
-                KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => arrow_helper(app, key_event),
+                KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => {
+                    arrow_helper(app, key_event)
+                }
                 KeyCode::Esc => app.quit_mode(),
                 KeyCode::Enter => single_select(app),
                 _ => {}
