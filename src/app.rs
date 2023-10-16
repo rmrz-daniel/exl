@@ -122,7 +122,6 @@ impl App {
 	}
 
 	pub fn header(&mut self) {
-		// let x = self.grid[0].clone().iter_mut().enumerate().map(| (index, cell)| cell.content = Self::index_to_excel_column(index)).collect();
 
 		for (index, cell) in self.grid[0].iter_mut().skip(1).enumerate() {
 			cell.content = Self::index_to_excel_column(index);
@@ -203,62 +202,4 @@ impl App {
             self.grid = previous_state.grid;
         }
     }
-
-    // pub fn init_table_grid(&mut self, width: u16, height: u16){
-    // 	Hard coded the values of 2 and 4 for the margins for now
-    // 	let w: usize = (width - 2).into();
-    // 	let h: usize = (height - 4).into();
-
-    // 	let cell_amount = w / CELL_WIDTH as usize;
-
-    // 	if w % CELL_WIDTH as usize != 0{
-    // 		// self.grid = vec![vec![Cell::default(); cell_amount + 1]; h];
-    // 		self.cell_amount = (cell_amount + 1, h);
-    // 	} else {
-    // 		// self.grid = vec![vec![Cell::default(); cell_amount]; h];
-    // 		self.cell_amount = (cell_amount, h);
-    // 	}
-
-    // }
-
-    // pub fn rerender_grid(&mut self, width: u16, height: u16) {
-    //     let cell_width = 12;
-    //     let mut desired_width = (width / cell_width) as usize;
-    //     let desired_height = height as usize;
-
-    //     // Handle extra column for remainder
-    //     let has_remainder = width % cell_width != 0;
-
-    //     // Adjust the number of rows
-    //     if self.grid.len() < desired_height {
-    //         // Add new rows
-    //         let additional_rows = desired_height - self.grid.len();
-    //         for _ in 0..additional_rows {
-    //             self.grid.push(vec!["".to_string(); desired_width]);
-    //         }
-    //     } else if self.grid.len() > desired_height {
-    //         // Remove extra rows
-    //         self.grid.truncate(desired_height);
-    //     }
-
-    //     // Adjust the number of columns for each row
-    //     for row in self.grid.iter_mut() {
-    //         if has_remainder {
-    //             // Add an extra column for the remainder
-    //             row.push("".to_string());
-    //             desired_width += 1;
-    //         }
-
-    //         if row.len() < desired_width {
-    //             // Add new cells to the row
-    //             let additional_cells = desired_width - row.len();
-    //             for _ in 0..additional_cells {
-    //                 row.push("".to_string());
-    //             }
-    //         } else if row.len() > desired_width {
-    //             // Remove extra cells from the row
-    //             row.truncate(desired_width);
-    //         }
-    //     }
-    // }
 }
