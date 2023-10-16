@@ -7,14 +7,14 @@ use std::todo;
 fn arrow_helper(app: &mut App, key_event: KeyEvent) {
     if key_event.modifiers == KeyModifiers::SHIFT {
         select(app)
-    } else if key_event.modifiers == KeyModifiers::CONTROL{
-      match key_event.code {
-        KeyCode::Left => app.insert_col(app.selected_col),
-        KeyCode::Right => app.insert_col(app.selected_col + 1),
-        KeyCode::Up => app.insert_row(app.selected_row + 1),
-        KeyCode::Down => app.insert_row(app.selected_row),
-        _ => {}
-    }
+    } else if key_event.modifiers == KeyModifiers::CONTROL {
+        match key_event.code {
+            KeyCode::Left => app.insert_col(app.selected_col),
+            KeyCode::Right => app.insert_col(app.selected_col + 1),
+            KeyCode::Up => app.insert_row(app.selected_row + 1),
+            KeyCode::Down => app.insert_row(app.selected_row),
+            _ => {}
+        }
     } else {
         match app.current_mode {
             crate::app::AppMode::Navigation
