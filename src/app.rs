@@ -149,6 +149,10 @@ impl App {
         self.header()
     }
 
+    pub fn delete(&mut self) {
+    	self.grid[self.selected_row][self.selected_col].content.clear();
+    }
+
     pub fn nav(&mut self, direction: ArrowKeys) {
         let row_amount = self.grid.len();
         let col_amount = self.grid[self.selected_row].len();
