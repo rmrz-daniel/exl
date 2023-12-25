@@ -1,4 +1,4 @@
-use crate::app::App;
+use crate::app::{App, AppMode};
 use crate::modes::edit::*;
 use crate::modes::select::*;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
@@ -9,31 +9,33 @@ fn arrow_helper(app: &mut App, key_event: KeyEvent) {
         select(app)
     } else if key_event.modifiers == KeyModifiers::CONTROL {
         match key_event.code {
-            KeyCode::Left => app.insert_col(app.selected_col),
-            KeyCode::Right => app.insert_col(app.selected_col + 1),
-            KeyCode::Up => app.insert_row(app.selected_row),
-            KeyCode::Down => app.insert_row(app.selected_row + 1),
+            KeyCode::Left | KeyCode::Char('h') => app.insert_col(app.selected_col),
+            KeyCode::Right | KeyCode::Char('l') => app.insert_col(app.selected_col + 1),
+            KeyCode::Up | KeyCode::Char('k') => app.insert_row(app.selected_row),
+            KeyCode::Down | KeyCode::Char('j') => app.insert_row(app.selected_row + 1),
             _ => {}
         }
     } else {
         match app.current_mode {
-            crate::app::AppMode::Navigation
-            | crate::app::AppMode::Formula
-            | crate::app::AppMode::SingleSelect => match key_event.code {
-                KeyCode::Right => app.nav(crate::app::ArrowKeys::Right),
-                KeyCode::Left => app.nav(crate::app::ArrowKeys::Left),
-                KeyCode::Down => app.nav(crate::app::ArrowKeys::Down),
-                KeyCode::Up => app.nav(crate::app::ArrowKeys::Up),
+            AppMode::Navigation | AppMode::Formula | AppMode::SingleSelect => {
+                match key_event.code {
+                    KeyCode::Right | KeyCode::Char('l') => app.nav(crate::app::ArrowKeys::Right),
+                    KeyCode::Left | KeyCode::Char('h') => app.nav(crate::app::ArrowKeys::Left),
+                    KeyCode::Down | KeyCode::Char('j') => app.nav(crate::app::ArrowKeys::Down),
+                    KeyCode::Up | KeyCode::Char('k') => app.nav(crate::app::ArrowKeys::Up),
+                    _ => {}
+                }
+            }
+            AppMode::Selecting => match key_event.code {
+                KeyCode::Right | KeyCode::Char('l') => {
+                    select_nav(app, crate::app::ArrowKeys::Right)
+                }
+                KeyCode::Left | KeyCode::Char('h') => select_nav(app, crate::app::ArrowKeys::Left),
+                KeyCode::Down | KeyCode::Char('j') => select_nav(app, crate::app::ArrowKeys::Down),
+                KeyCode::Up | KeyCode::Char('k') => select_nav(app, crate::app::ArrowKeys::Up),
                 _ => {}
             },
-            crate::app::AppMode::Selecting => match key_event.code {
-                KeyCode::Right => select_nav(app, crate::app::ArrowKeys::Right),
-                KeyCode::Left => select_nav(app, crate::app::ArrowKeys::Left),
-                KeyCode::Down => select_nav(app, crate::app::ArrowKeys::Down),
-                KeyCode::Up => select_nav(app, crate::app::ArrowKeys::Up),
-                _ => {}
-            },
-            crate::app::AppMode::Editing => match key_event.code {
+            AppMode::Editing => match key_event.code {
                 KeyCode::Right => cursor_right(app),
                 KeyCode::Left => cursor_left(app),
                 _ => {}
@@ -44,15 +46,20 @@ fn arrow_helper(app: &mut App, key_event: KeyEvent) {
 
 pub fn update(app: &mut App, key_event: KeyEvent) {
     match app.current_mode {
-        crate::app::AppMode::Navigation => {
+        AppMode::Navigation => {
             match key_event.code {
                 KeyCode::Esc => app.quit(),
-                KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => {
-                    arrow_helper(app, key_event)
-                }
-                KeyCode::Backspace => app.delete(),
-                KeyCode::Char('z') => app.undo(),
-                KeyCode::Enter => {
+                KeyCode::Right
+                | KeyCode::Left
+                | KeyCode::Down
+                | KeyCode::Up
+                | KeyCode::Char('h')
+                | KeyCode::Char('j')
+                | KeyCode::Char('k')
+                | KeyCode::Char('l') => arrow_helper(app, key_event),
+                KeyCode::Backspace | KeyCode::Char('x') => app.delete(),
+                KeyCode::Char('z') | KeyCode::Char('u') => app.undo(),
+                KeyCode::Enter | KeyCode::Char('i') | KeyCode::Char('a') => {
                     if key_event.modifiers == KeyModifiers::CONTROL {
                         single_select(app)
                     } else {
@@ -62,7 +69,7 @@ pub fn update(app: &mut App, key_event: KeyEvent) {
                 _ => {}
             };
         }
-        crate::app::AppMode::Editing => {
+        AppMode::Editing => {
             match key_event.code {
                 KeyCode::Right | KeyCode::Left => arrow_helper(app, key_event),
                 KeyCode::Esc => app.quit_mode(),
@@ -72,26 +79,36 @@ pub fn update(app: &mut App, key_event: KeyEvent) {
                 _ => {}
             };
         }
-        crate::app::AppMode::Selecting => {
+        AppMode::Selecting => {
             match key_event.code {
-                KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => {
-                    arrow_helper(app, key_event)
-                }
+                KeyCode::Right
+                | KeyCode::Left
+                | KeyCode::Down
+                | KeyCode::Up
+                | KeyCode::Char('h')
+                | KeyCode::Char('j')
+                | KeyCode::Char('k')
+                | KeyCode::Char('l') => arrow_helper(app, key_event),
                 KeyCode::Esc => app.quit_mode(),
                 _ => {}
             };
         }
-        crate::app::AppMode::SingleSelect => {
+        AppMode::SingleSelect => {
             match key_event.code {
-                KeyCode::Right | KeyCode::Left | KeyCode::Down | KeyCode::Up => {
-                    arrow_helper(app, key_event)
-                }
+                KeyCode::Right
+                | KeyCode::Left
+                | KeyCode::Down
+                | KeyCode::Up
+                | KeyCode::Char('h')
+                | KeyCode::Char('j')
+                | KeyCode::Char('k')
+                | KeyCode::Char('l') => arrow_helper(app, key_event),
                 KeyCode::Esc => app.quit_mode(),
-                KeyCode::Enter => single_select(app),
+                KeyCode::Enter | KeyCode::Char('i') | KeyCode::Char('a') => single_select(app),
                 _ => {}
             };
         }
-        crate::app::AppMode::Formula => {
+        AppMode::Formula => {
             match key_event.code {
                 KeyCode::Right | KeyCode::Left => arrow_helper(app, key_event),
                 KeyCode::Esc => app.quit_mode(),
