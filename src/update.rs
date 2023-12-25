@@ -59,6 +59,7 @@ pub fn update(app: &mut App, key_event: KeyEvent) {
                 | KeyCode::Char('l') => arrow_helper(app, key_event),
                 KeyCode::Backspace | KeyCode::Char('x') => app.delete(),
                 KeyCode::Char('z') | KeyCode::Char('u') => app.undo(),
+                KeyCode::Char('y') | KeyCode::Char('r') => app.redo(),
                 KeyCode::Enter | KeyCode::Char('i') | KeyCode::Char('a') => {
                     if key_event.modifiers == KeyModifiers::CONTROL {
                         single_select(app)
