@@ -5,6 +5,7 @@ pub struct App {
     pub should_quit: bool,
     pub grid: Vec<Vec<Cell>>,
     pub undo_stack: Vec<GridState>,
+    pub redo_stack: Vec<GridState>,
     pub selected_row: usize,
     pub selected_col: usize,
     pub selected_range: Option<MinMaxRange>,
@@ -43,6 +44,7 @@ impl Default for App {
             should_quit: false,
             grid: vec![vec![Cell::default(); 27]; 200],
             undo_stack: vec![],
+            redo_stack: vec![],
             selected_row: 1,
             selected_col: 1,
             selected_range: None,
@@ -207,6 +209,18 @@ impl App {
 
     pub fn undo(&mut self) {
         if let Some(previous_state) = self.undo_stack.pop() {
+            self.redo_stack.push(GridState {
+                grid: self.grid.clone(),
+            });
+            self.grid = previous_state.grid;
+        }
+    }
+
+    pub fn redo(&mut self) {
+        if let Some(previous_state) = self.redo_stack.pop() {
+            self.undo_stack.push(GridState {
+                grid: self.grid.clone(),
+            });
             self.grid = previous_state.grid;
         }
     }
